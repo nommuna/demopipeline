@@ -1,11 +1,9 @@
 name: demo-workflow
-
 on:
   push:
-    branches: [ main ]
-
+    branches: [ master ]
 jobs:
-  build:
+  frontend-test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -21,5 +19,23 @@ jobs:
         run: |
           cd demofrontend
           npm ci
-      - name: Run frontend tests
-        run: npm test
+      - name: Frontend tests
+        run: |
+          cd demofrontend
+          npm run test
+  backend-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
+      - name: Test backend
+        run: |
+          cd demobackend
+          ./gradlew test
